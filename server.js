@@ -46,23 +46,17 @@ app.get("/download/:name", (req, res) => {
   const { name } = req.params;
   const { pw } = req.query;
 
-  if (pw !== PASSWORD) {
-    return res.status(403).send("Falsches Passwort.");
-  }
+  if (pw !== PASSWORD) return res.status(403).send("Falsches Passwort.");
 
   const filePath = path.join(UPLOAD_DIR, name);
-  if (!fs.existsSync(filePath)) {
-    return res.status(404).send("Datei nicht gefunden.");
-  }
+  if (!fs.existsSync(filePath)) return res.status(404).send("Datei nicht gefunden.");
 
   res.download(filePath);
 });
 
 // Alle löschen
 app.post("/clear", (req, res) => {
-  fs.readdirSync(UPLOAD_DIR).forEach(file => {
-    fs.unlinkSync(path.join(UPLOAD_DIR, file));
-  });
+  fs.readdirSync(UPLOAD_DIR).forEach(file => fs.unlinkSync(path.join(UPLOAD_DIR, file)));
   res.json({ success: true });
 });
 
@@ -70,3 +64,4 @@ app.post("/clear", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server läuft auf http://localhost:${PORT}`);
 });
+
