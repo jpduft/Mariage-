@@ -1,1 +1,510 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Foto teilen & anschauen — Stuchlik Galerie</title>
 
+<!-- Elegantes, schlichtes CSS -->
+<style>
+  :root{
+    --bg: #f7f8fa;
+    --card: #ffffff;
+    --muted: #6b7280;
+    --accent: #0f766e;
+    --accent-2: #065f46;
+    --glass: rgba(255,255,255,0.6);
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+  html,body{height:100%;}
+  body{
+    margin:0;
+    min-height:100%;
+    background: linear-gradient(180deg,#f8fafc 0%, #eef2f7 100%);
+    color:#0f172a;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:28px;
+  }
+
+  .container{
+    width:100%;
+    max-width:980px;
+    background:var(--card);
+    border-radius:14px;
+    box-shadow: 0 10px 30px rgba(12,18,30,0.08);
+    padding:22px;
+    box-sizing:border-box;
+    overflow:hidden;
+  }
+
+  header{
+    display:flex;
+    gap:16px;
+    align-items:center;
+    margin-bottom:18px;
+  }
+  .brand{
+    display:flex;
+    gap:12px;
+    align-items:center;
+  }
+  .logo{
+    width:48px;height:48px;border-radius:10px;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:20px;
+    box-shadow: 0 6px 18px rgba(6,95,70,0.12);
+  }
+  h1{margin:0;font-size:18px;}
+  p.lead{margin:0;color:var(--muted);font-size:13px}
+
+  .top-row{
+    display:flex;gap:12px;align-items:center;margin-top:14px;
+  }
+  .upload-area{
+    flex:1;
+    border:2px dashed rgba(15,118,110,0.12);
+    padding:14px;border-radius:10px;
+    min-height:88px;display:flex;flex-direction:column;gap:8px;align-items:flex-start;
+    background: linear-gradient(180deg, rgba(15,118,110,0.02), rgba(6,95,70,0.01));
+  }
+  .upload-area.dragover{border-color:var(--accent);background:linear-gradient(180deg, rgba(15,118,110,0.04), rgba(6,95,70,0.01));}
+
+  .controls{
+    display:flex;gap:8px;align-items:center;
+  }
+  .btn{
+    border:0;padding:8px 12px;border-radius:8px;font-weight:600;cursor:pointer;
+    background:var(--accent);color:white;
+    box-shadow: 0 6px 14px rgba(6,95,70,0.12);
+  }
+  .btn.secondary{background:transparent;color:var(--accent);border:1px solid rgba(15,118,110,0.12);box-shadow:none;font-weight:600;}
+  input[type=file]{display:none}
+
+  .qr-box{
+    width:140px;padding:10px;border-radius:10px;background:var(--glass);display:flex;flex-direction:column;align-items:center;justify-content:center;
+  }
+  .muted{color:var(--muted);font-size:13px}
+
+  /* Gallery */
+  .gallery-wrap{margin-top:18px;}
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill,minmax(150px,1fr));
+    gap:12px;
+  }
+  .thumb{
+    background: linear-gradient(180deg,#fff,#fbfbfd);
+    border-radius:10px;padding:6px;box-shadow: 0 6px 18px rgba(12,18,30,0.04);
+    display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;
+    aspect-ratio: 4/3;
+  }
+  .thumb img{max-width:100%;max-height:100%;object-fit:cover;border-radius:6px;display:block;}
+  .thumb .meta{position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,0.45);color:white;padding:4px 6px;border-radius:6px;font-size:12px;}
+  .actions{display:flex;gap:6px;align-items:center;justify-content:flex-end;margin-top:10px;}
+
+  .link-like{background:transparent;border:0;color:var(--accent);cursor:pointer;font-weight:600}
+
+  /* modal / lightbox */
+  .modal{
+    position:fixed;inset:0;background:rgba(6,10,12,0.55);display:none;align-items:center;justify-content:center;padding:20px;z-index:40;
+  }
+  .modal.open{display:flex}
+  .modal .card{
+    width:100%;max-width:920px;height:90%;background:white;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;
+  }
+  .modal-header{display:flex;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #f0f2f5}
+  .modal-body{flex:1;display:flex;align-items:center;justify-content:center;padding:12px;background: #f8fafc}
+  .modal-body img{max-width:100%;max-height:100%;object-fit:contain}
+
+  /* password prompt */
+  .pw-wrap{display:flex;gap:8px;align-items:center}
+  .pw-wrap input{padding:8px;border-radius:8px;border:1px solid #e6e9ef}
+
+  footer{margin-top:14px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;align-items:center}
+  @media (max-width:640px){
+    .top-row{flex-direction:column}
+    .qr-box{width:100%}
+  }
+</style>
+</head>
+<body>
+<div class="container" id="app">
+  <header>
+    <div class="brand">
+      <div class="logo">S</div>
+      <div>
+        <h1>Stuchlik Galerie</h1>
+        <p class="lead">Fotos hochladen, anschauen und (mit Passwort) herunterladen.</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="top-row">
+    <div class="upload-area" id="dropZone">
+      <div style="display:flex;justify-content:space-between;align-items:center;width:100%">
+        <div>
+          <strong>Fotos hochladen</strong>
+          <div class="muted">Ziehe Bilder hier hinein oder wähle Dateien aus.</div>
+        </div>
+        <div class="controls">
+          <label class="btn secondary" for="fileInput">Dateien wählen</label>
+          <input id="fileInput" type="file" accept="image/*" multiple />
+          <button class="btn" id="clearAllBtn" title="Alle entfernen">Alle löschen</button>
+        </div>
+      </div>
+      <div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <div class="muted">QR-Code für diese Seite:</div>
+        <div class="qr-box" id="qrContainer" title="QR-Code der aktuellen Seite">
+          <!-- QR wird hier gerendert -->
+          <div id="qrcode"></div>
+          <div style="font-size:12px;margin-top:8px" class="muted">Scanne, um zur Seite zu gelangen</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="width:240px;display:flex;flex-direction:column;gap:10px">
+      <div style="padding:10px;border-radius:10px;background:var(--card);box-shadow: 0 6px 18px rgba(12,18,30,0.03)">
+        <div style="font-weight:700;margin-bottom:6px">Downloads schützen</div>
+        <div class="muted" style="margin-bottom:8px">Gib das Passwort ein, um Download-Buttons freizuschalten.</div>
+        <div class="pw-wrap">
+          <input id="pwInput" type="password" placeholder="Passwort" />
+          <button class="btn" id="pwBtn">Prüfen</button>
+        </div>
+        <div id="pwHint" class="muted" style="margin-top:8px;font-size:13px">Passwort: <strong>Stuchlik26</strong></div>
+      </div>
+
+      <div style="padding:10px;border-radius:10px;background:var(--glass);display:flex;flex-direction:column;gap:8px;align-items:flex-start">
+        <div class="muted" style="font-weight:700">Teilen — Hinweise</div>
+        <div class="muted" style="font-size:13px">
+          Diese Demo speichert Bilder nur lokal im Browser. Um Bilder wirklich mit anderen zu teilen, hoste diese Seite auf einem Server und implementiere ein kleines Backend zum Speichern/Servieren der Bilder.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="gallery-wrap">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="font-weight:700">Galerie</div>
+      <div class="muted" id="countInfo">0 Bilder</div>
+    </div>
+
+    <div class="grid" id="gallery"></div>
+
+    <div class="actions" style="margin-top:12px">
+      <button class="btn secondary" id="exportBtn">Export (Backup)</button>
+      <button class="btn" id="importBtn">Import (Backup laden)</button>
+      <input type="file" id="importFile" accept=".json" style="display:none"/>
+    </div>
+  </div>
+
+  <footer>
+    <div>Design: freundlich & elegant • Demo</div>
+    <div class="muted">Achtung: Passwort in dieser Demo im Browser sichtbar.</div>
+  </footer>
+</div>
+
+<!-- QRCode JS (CDN) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<script>
+/*
+  Stuchlik Galerie — clientseitige Demo
+
+  Funktionen:
+  - Bilder per Drag&Drop / Dateiauswahl hinzufügen
+  - Speicherung in localStorage als Base64 (für Demo / kleine Mengen)
+  - Galerie mit Lightbox
+  - Download nur nach Passworteingabe (Passwort: "Stuchlik26")
+  - QR-Code der aktuellen URL
+  - Export/Import Backup (JSON)
+*/
+
+const PASSWORD = "Stuchlik26"; // *** sichtbar im Client-Code (nicht sicher) ***
+const STORAGE_KEY = "stuchlik_gallery_images_v1";
+
+const dropZone = document.getElementById("dropZone");
+const fileInput = document.getElementById("fileInput");
+const gallery = document.getElementById("gallery");
+const countInfo = document.getElementById("countInfo");
+const pwInput = document.getElementById("pwInput");
+const pwBtn = document.getElementById("pwBtn");
+const pwHint = document.getElementById("pwHint");
+const clearAllBtn = document.getElementById("clearAllBtn");
+const exportBtn = document.getElementById("exportBtn");
+const importBtn = document.getElementById("importBtn");
+const importFile = document.getElementById("importFile");
+
+// Initialize QR
+new QRCode(document.getElementById("qrcode"), {
+  text: location.href,
+  width: 110,
+  height: 110,
+  colorDark : "#0f766e",
+  colorLight : "#ffffff",
+  correctLevel : QRCode.CorrectLevel.H
+});
+
+// helpers
+function saveImages(images){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(images));
+}
+function loadImages(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return [];
+    return JSON.parse(raw);
+  }catch(e){
+    console.error(e);
+    return [];
+  }
+}
+
+function renderGallery(){
+  const images = loadImages();
+  gallery.innerHTML = "";
+  countInfo.textContent = images.length + (images.length === 1 ? " Bild" : " Bilder");
+  images.forEach((item, idx) => {
+    const card = document.createElement("div");
+    card.className = "thumb";
+    card.innerHTML = \`
+      <img src="\${item.data}" alt="\${item.name}" loading="lazy" />
+      <div class="meta">\${item.name}</div>
+    \`;
+    // click -> lightbox
+    card.addEventListener("click", (ev) => {
+      openLightbox(idx);
+    });
+
+    // right top small menu
+    const menu = document.createElement("div");
+    menu.style.position = "absolute";
+    menu.style.top = "8px";
+    menu.style.right = "8px";
+    menu.style.display = "flex";
+    menu.style.gap = "6px";
+
+    const dlBtn = document.createElement("button");
+    dlBtn.className = "link-like";
+    dlBtn.textContent = "Herunterladen";
+    dlBtn.onclick = (e) => {
+      e.stopPropagation();
+      requirePasswordThen(() => {
+        triggerDownload(item);
+      });
+    };
+
+    const delBtn = document.createElement("button");
+    delBtn.className = "link-like";
+    delBtn.textContent = "Löschen";
+    delBtn.onclick = (e) => {
+      e.stopPropagation();
+      if(confirm('Dieses Bild wirklich löschen?')) {
+        deleteImage(idx);
+      }
+    };
+
+    menu.appendChild(dlBtn);
+    menu.appendChild(delBtn);
+    card.appendChild(menu);
+
+    gallery.appendChild(card);
+  });
+
+  if(images.length === 0){
+    gallery.innerHTML = '<div style="padding:18px;border-radius:10px;background:#fbfdff;border:1px dashed #e6eef0;color:#6b7280">Keine Bilder. Lade Bilder hoch um sie hier zu sehen.</div>';
+  }
+}
+
+// Lightbox
+let currentLightboxIndex = null;
+function openLightbox(index){
+  const images = loadImages();
+  if(!images[index]) return;
+  currentLightboxIndex = index;
+
+  const modal = document.createElement("div");
+  modal.className = "modal open";
+  modal.innerHTML = \`
+    <div class="card">
+      <div class="modal-header">
+        <div style="font-weight:700">\${images[index].name}</div>
+        <div>
+          <button id="modalDownloadBtn" class="btn">Download</button>
+          <button id="modalCloseBtn" class="btn secondary">Schließen</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <img src="\${images[index].data}" alt="\${images[index].name}">
+      </div>
+    </div>
+  \`;
+
+  document.body.appendChild(modal);
+
+  modal.querySelector("#modalCloseBtn").onclick = () => {
+    modal.remove();
+  };
+
+  modal.querySelector("#modalDownloadBtn").onclick = (ev) => {
+    requirePasswordThen(() => {
+      triggerDownload(images[index]);
+    });
+  };
+}
+
+function triggerDownload(item){
+  const a = document.createElement("a");
+  a.href = item.data;
+  a.download = item.name || "photo.png";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
+// password gating
+let unlocked = false;
+function requirePasswordThen(cb){
+  if(unlocked){
+    cb();
+    return;
+  }
+  const attempt = prompt("Bitte Passwort eingeben, um Download zu erlauben:");
+  if(attempt === null) return;
+  if(attempt === PASSWORD){
+    unlocked = true;
+    alert("Passwort korrekt — Downloads freigeschaltet.");
+    cb();
+  } else {
+    alert("Falsches Passwort.");
+  }
+}
+pwBtn.addEventListener("click", () => {
+  const val = pwInput.value || "";
+  if(val === PASSWORD){
+    unlocked = true;
+    pwInput.value = "";
+    alert("Passwort korrekt — Downloads freigeschaltet.");
+  } else {
+    unlocked = false;
+    alert("Falsches Passwort.");
+  }
+});
+
+// image add/remove
+function addFiles(files){
+  const images = loadImages();
+
+  const fileList = Array.from(files).filter(f => f.type && f.type.startsWith("image/"));
+  if(fileList.length === 0) return;
+
+  let loaded = 0;
+  fileList.forEach(f => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      images.unshift({
+        name: f.name,
+        size: f.size,
+        type: f.type,
+        added: new Date().toISOString(),
+        data: e.target.result
+      });
+      loaded++;
+      if(loaded === fileList.length){
+        // cap storage size: keep only last 60 images to prevent localStorage overflow (demo)
+        if(images.length > 60) images.length = 60;
+        saveImages(images);
+        renderGallery();
+      }
+    };
+    reader.readAsDataURL(f);
+  });
+}
+
+function deleteImage(index){
+  const images = loadImages();
+  images.splice(index,1);
+  saveImages(images);
+  renderGallery();
+}
+
+clearAllBtn.addEventListener("click", () => {
+  if(confirm("Alle Bilder löschen? Diese Aktion ist endgültig.")){
+    localStorage.removeItem(STORAGE_KEY);
+    renderGallery();
+  }
+});
+
+// drag & drop
+dropZone.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  dropZone.classList.add("dragover");
+});
+dropZone.addEventListener("dragleave", (e) => {
+  dropZone.classList.remove("dragover");
+});
+dropZone.addEventListener("drop", (e) => {
+  e.preventDefault();
+  dropZone.classList.remove("dragover");
+  if(e.dataTransfer.files){
+    addFiles(e.dataTransfer.files);
+  }
+});
+
+// file input
+fileInput.addEventListener("change", (e) => {
+  if(e.target.files) addFiles(e.target.files);
+  fileInput.value = "";
+});
+
+// export/import
+exportBtn.addEventListener("click", () => {
+  const images = loadImages();
+  const blob = new Blob([JSON.stringify(images)], {type: "application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "stuchlik_gallery_backup.json";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+});
+
+importBtn.addEventListener("click", () => importFile.click());
+importFile.addEventListener("change", (e) => {
+  const f = e.target.files[0];
+  if(!f) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try{
+      const arr = JSON.parse(ev.target.result);
+      if(!Array.isArray(arr)) throw new Error("Ungültiges Format");
+      // replace current gallery with imported (confirm)
+      if(confirm("Backup importieren und aktuelle Bilder ersetzen?")){
+        saveImages(arr);
+        renderGallery();
+      }
+    }catch(err){
+      alert("Fehler beim Import: " + err.message);
+    }
+  };
+  reader.readAsText(f);
+  importFile.value = "";
+});
+
+// small helpers for hosting: when hosted, QR code should point to hosted URL
+// (we already generated QR for location.href on load)
+
+// init
+renderGallery();
+
+// accessibility: update QR if location changes (single page this is static)
+window.addEventListener("popstate", () => {
+  // regenerate QR if URL changed:
+  const q = document.getElementById("qrcode");
+  q.innerHTML = "";
+  new QRCode(q, {text: location.href, width:110, height:110, colorDark:"#0f766e", colorLight:"#ffffff", correctLevel: QRCode.CorrectLevel.H});
+});
+</script>
+</body>
+</html>
