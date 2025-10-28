@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Stuchlik Galerie</title>
+<title>Laura´s und Patrick`s Galerie</title>
 <style>
 body{margin:0;font-family:"Inter",sans-serif;background:#f7f8fa;color:#0f172a;padding:28px;display:flex;justify-content:center;min-height:100vh}
 .container{width:100%;max-width:980px;background:white;border-radius:14px;box-shadow:0 10px 30px rgba(12,18,30,0.08);padding:22px;overflow:hidden}
@@ -13,7 +13,7 @@ header{display:flex;gap:16px;align-items:center;margin-bottom:18px}
 h1{margin:0;font-size:18px}
 p.lead{margin:0;color:#6b7280;font-size:13px}
 .top-row{display:flex;gap:12px;align-items:flex-start;margin-top:14px;flex-wrap:wrap}
-.upload-area{flex:1;border:2px dashed rgba(15,118,110,0.12);padding:14px;border-radius:10px;min-height:88px;display:flex;flex-direction:column;gap:8px;align-items:flex-start;background: linear-gradient(180deg, rgba(15,118,110,0.02), rgba(6,95,70,0.01));cursor:pointer}
+.upload-area{flex:1;border:2px dashed rgba(15,118,110,0.12);padding:14px;border-radius:10px;min-height:88px;display:flex;flex-direction:column;gap:8px;align-items:flex-start;background:linear-gradient(180deg, rgba(15,118,110,0.02), rgba(6,95,70,0.01));cursor:pointer}
 .upload-area.dragover{border-color:#0f766e;background:linear-gradient(180deg, rgba(15,118,110,0.04), rgba(6,95,70,0.01))}
 .controls{display:flex;gap:8px;align-items:center;margin-top:8px}
 .btn{border:0;padding:8px 12px;border-radius:8px;font-weight:600;cursor:pointer;background:#0f766e;color:white;box-shadow:0 6px 14px rgba(6,95,70,0.12)}
@@ -32,7 +32,7 @@ input[type=file]{display:none}
     <div class="brand">
       <div class="logo">S</div>
       <div>
-        <h1>Stuchlik Galerie</h1>
+        <h1>Laura´s und Patrick`s Galerie</h1>
         <p class="lead">Fotos hochladen, anschauen und herunterladen (mit Passwort).</p>
       </div>
     </div>
@@ -58,10 +58,8 @@ const dropZone = document.getElementById("dropZone");
 const fileInput = document.getElementById("fileInput");
 const gallery = document.getElementById("gallery");
 const clearAllBtn = document.getElementById("clearAllBtn");
-
 const PASSWORD = "Stuchlik26";
 
-// Upload-Funktion
 dropZone.addEventListener("click", ()=>fileInput.click());
 dropZone.addEventListener("dragover", e=>{ e.preventDefault(); dropZone.classList.add("dragover"); });
 dropZone.addEventListener("dragleave", e=>{ dropZone.classList.remove("dragover"); });
@@ -72,18 +70,11 @@ async function handleFiles(files){
   for(const file of files){
     const form = new FormData();
     form.append('file', file);
-    try {
-      const res = await fetch('/upload', { method:'POST', body: form });
-      const data = await res.json();
-      if(!data.success) alert(`Upload von ${file.name} fehlgeschlagen`);
-    } catch(err){
-      alert(`Upload-Fehler: ${err}`);
-    }
+    await fetch('/upload', { method:'POST', body: form });
   }
   loadGallery();
 }
 
-// Galerie laden
 async function loadGallery(){
   const res = await fetch('/images');
   const images = await res.json();
@@ -96,7 +87,6 @@ async function loadGallery(){
   });
 }
 
-// Download mit Passwort
 function downloadImage(name){
   const pw = prompt("Passwort eingeben:");
   if(pw !== PASSWORD){ alert("Falsches Passwort"); return; }
@@ -105,15 +95,15 @@ function downloadImage(name){
   link.click();
 }
 
-// Alle löschen
 clearAllBtn.addEventListener("click", async ()=>{
   if(!confirm("Alle Bilder löschen?")) return;
   await fetch('/clear', { method:'POST' });
   loadGallery();
 });
 
-// Initial Galerie laden
+// initial Galerie laden
 loadGallery();
 </script>
 </body>
 </html>
+
