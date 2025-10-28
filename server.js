@@ -33,7 +33,7 @@ app.post("/upload", upload.single("file"), (req, res) => {
 // Galerie laden
 app.get("/images", (req, res) => {
   const files = fs.readdirSync(UPLOAD_DIR).map(name => ({
-    name,
+    name: name,
     url: `/uploads/${encodeURIComponent(name)}`
   }));
   res.json(files);
