@@ -1,71 +1,199 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Laura´s und Patrick´s Galerie</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Stuchlik Galerie</title>
+
 <style>
-body{margin:0;font-family:sans-serif;background:#f7f8fa;color:#0f172a;padding:20px}
-.container{max-width:900px;margin:0 auto;background:white;padding:20px;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.05)}
-h1{margin-top:0;font-size:22px}
-.upload-area{border:2px dashed #0f766e;padding:20px;border-radius:10px;text-align:center;margin-bottom:20px;cursor:pointer}
-.upload-area.dragover{background:rgba(15,118,110,0.05)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
-.thumb{position:relative;border-radius:10px;overflow:hidden;background:#fff;padding:6px;box-shadow:0 4px 12px rgba(0,0,0,0.05)}
-.thumb img{width:100%;height:100%;object-fit:cover;border-radius:6px}
-.thumb .meta{position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,0.45);color:white;padding:4px 6px;border-radius:6px;font-size:12px}
-.link-like{background:transparent;border:0;color:#0f766e;cursor:pointer;font-weight:600;margin-left:6px}
+:root{
+  --bg:#f7f8fa;
+  --card:#ffffff;
+  --muted:#6b7280;
+  --accent:#0f766e;
+  --accent-2:#065f46;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+body{
+  margin:0;
+  background: linear-gradient(180deg,#f8fafc 0%, #eef2f7 100%);
+  color:#0f172a;
+  padding:28px;
+  display:flex;
+  justify-content:center;
+  min-height:100vh;
+}
+.container{
+  width:100%;
+  max-width:980px;
+  background:var(--card);
+  border-radius:14px;
+  box-shadow: 0 10px 30px rgba(12,18,30,0.08);
+  padding:22px;
+  box-sizing:border-box;
+  overflow:hidden;
+}
+header{
+  display:flex;
+  gap:16px;
+  align-items:center;
+  margin-bottom:18px;
+}
+.brand{
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+.logo{
+  width:48px;height:48px;border-radius:10px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:20px;
+}
+h1{margin:0;font-size:18px;}
+p.lead{margin:0;color:var(--muted);font-size:13px}
+
+.top-row{
+  display:flex;gap:12px;align-items:flex-start;margin-top:14px;
+}
+.upload-area{
+  flex:1;
+  border:2px dashed rgba(15,118,110,0.12);
+  padding:14px;border-radius:10px;
+  min-height:88px;display:flex;flex-direction:column;gap:8px;align-items:flex-start;
+  background: linear-gradient(180deg, rgba(15,118,110,0.02), rgba(6,95,70,0.01));
+  cursor:pointer;
+}
+.upload-area.dragover{border-color:var(--accent);background:linear-gradient(180deg, rgba(15,118,110,0.04), rgba(6,95,70,0.01));}
+
+.controls{
+  display:flex;gap:8px;align-items:center;
+}
+.btn{
+  border:0;padding:8px 12px;border-radius:8px;font-weight:600;cursor:pointer;
+  background:var(--accent);color:white;
+  box-shadow: 0 6px 14px rgba(6,95,70,0.12);
+}
+.btn.secondary{background:transparent;color:var(--accent);border:1px solid rgba(15,118,110,0.12);box-shadow:none;font-weight:600;}
+input[type=file]{display:none}
+
+.grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fill,minmax(150px,1fr));
+  gap:12px;
+}
+.thumb{
+  background: linear-gradient(180deg,#fff,#fbfbfd);
+  border-radius:10px;padding:6px;box-shadow: 0 6px 18px rgba(12,18,30,0.04);
+  display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;
+  aspect-ratio: 4/3;
+}
+.thumb img{max-width:100%;max-height:100%;object-fit:cover;border-radius:6px;display:block;}
+.thumb .meta{position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,0.45);color:white;padding:4px 6px;border-radius:6px;font-size:12px;}
+.link-like{background:transparent;border:0;color:var(--accent);cursor:pointer;font-weight:600;margin-left:6px;}
 </style>
 </head>
 <body>
 <div class="container">
-  <h1>Laura´s und Patrick´s Galerie</h1>
-  <div class="upload-area" id="dropZone">Ziehe Bilder hier hinein oder klicke zum Hochladen</div>
-  <input type="file" id="fileInput" multiple style="display:none">
+  <header>
+    <div class="brand">
+      <div class="logo">S</div>
+      <div>
+        <h1>Stuchlik Galerie</h1>
+        <p class="lead">Fotos hochladen, anschauen und herunterladen (mit Passwort).</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="top-row">
+    <div class="upload-area" id="dropZone">
+      <div>
+        <strong>Fotos hochladen</strong>
+        <div class="muted">Ziehe Bilder hier hinein oder klicke zum Hochladen.</div>
+      </div>
+      <div class="controls">
+        <input type="file" id="fileInput" multiple>
+        <button class="btn secondary" id="clearAllBtn">Alle löschen</button>
+      </div>
+    </div>
+
+    <div style="width:240px;display:flex;flex-direction:column;gap:10px">
+      <div style="padding:10px;border-radius:10px;background:var(--card);box-shadow: 0 6px 18px rgba(12,18,30,0.03)">
+        <div style="font-weight:700;margin-bottom:6px">Downloads schützen</div>
+        <div class="muted" style="margin-bottom:8px">Gib das Passwort ein, um Download-Buttons freizuschalten.</div>
+        <div class="pw-wrap">
+          <input id="pwInput" type="password" placeholder="Passwort">
+          <button class="btn" id="pwBtn">Prüfen</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="grid" id="gallery"></div>
 </div>
 
 <script>
-const PASSWORD = "Stuchlik26";
 const dropZone = document.getElementById("dropZone");
 const fileInput = document.getElementById("fileInput");
 const gallery = document.getElementById("gallery");
+const pwInput = document.getElementById("pwInput");
+const pwBtn = document.getElementById("pwBtn");
+const clearAllBtn = document.getElementById("clearAllBtn");
 
-dropZone.addEventListener("click",()=>fileInput.click());
-dropZone.addEventListener("dragover",e=>{e.preventDefault(); dropZone.classList.add("dragover");});
-dropZone.addEventListener("dragleave",e=>{dropZone.classList.remove("dragover");});
-dropZone.addEventListener("drop",e=>{e.preventDefault(); dropZone.classList.remove("dragover"); handleFiles(e.dataTransfer.files);});
-fileInput.addEventListener("change",e=>handleFiles(e.target.files));
+const PASSWORD = "Stuchlik26";
+let unlocked = false;
+
+// Upload-Funktion
+dropZone.addEventListener("click", ()=>fileInput.click());
+dropZone.addEventListener("dragover", e=>{ e.preventDefault(); dropZone.classList.add("dragover"); });
+dropZone.addEventListener("dragleave", e=>{ dropZone.classList.remove("dragover"); });
+dropZone.addEventListener("drop", e=>{ e.preventDefault(); dropZone.classList.remove("dragover"); handleFiles(e.dataTransfer.files); });
+fileInput.addEventListener("change", e=>handleFiles(e.target.files));
 
 async function handleFiles(files){
   for(const file of files){
     const form = new FormData();
     form.append('file', file);
-    await fetch('/upload',{method:'POST',body:form});
+    await fetch('/upload', { method:'POST', body: form });
   }
   loadGallery();
 }
 
+// Galerie laden
 async function loadGallery(){
   const res = await fetch('/images');
   const images = await res.json();
-  gallery.innerHTML="";
+  gallery.innerHTML = "";
   images.forEach(img=>{
     const card = document.createElement('div');
-    card.className="thumb";
+    card.className = "thumb";
     card.innerHTML = `<img src="${img.url}" alt="${img.name}"><div class="meta">${img.name}<button class="link-like" onclick="downloadImage('${img.name}')">Download</button></div>`;
     gallery.appendChild(card);
   });
 }
 
+// Download
 function downloadImage(name){
-  const pw = prompt("Passwort eingeben, um das Bild herunterzuladen:");
-  if(!pw) return;
+  const pw = prompt("Passwort eingeben:");
+  if(pw !== PASSWORD){ alert("Falsches Passwort"); return; }
   const link = document.createElement('a');
   link.href = `/download/${encodeURIComponent(name)}?pw=${encodeURIComponent(pw)}`;
   link.click();
 }
 
+// Alle löschen
+clearAllBtn.addEventListener("click", async ()=>{
+  if(!confirm("Alle Bilder löschen?")) return;
+  await fetch('/clear', { method:'POST' });
+  loadGallery();
+});
+
+// Passwort prüfen
+pwBtn.addEventListener("click", ()=>{
+  if(pwInput.value === PASSWORD){ unlocked = true; alert("Passwort korrekt — Downloads freigeschaltet."); }
+  else { unlocked=false; alert("Falsches Passwort."); }
+});
+
+// initial Galerie laden
 loadGallery();
 </script>
 </body>
