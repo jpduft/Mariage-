@@ -6,90 +6,25 @@
 <title>Stuchlik Galerie</title>
 
 <style>
-:root{
-  --bg:#f7f8fa;
-  --card:#ffffff;
-  --muted:#6b7280;
-  --accent:#0f766e;
-  --accent-2:#065f46;
-  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-}
-body{
-  margin:0;
-  background: linear-gradient(180deg,#f8fafc 0%, #eef2f7 100%);
-  color:#0f172a;
-  padding:28px;
-  display:flex;
-  justify-content:center;
-  min-height:100vh;
-}
-.container{
-  width:100%;
-  max-width:980px;
-  background:var(--card);
-  border-radius:14px;
-  box-shadow: 0 10px 30px rgba(12,18,30,0.08);
-  padding:22px;
-  box-sizing:border-box;
-  overflow:hidden;
-}
-header{
-  display:flex;
-  gap:16px;
-  align-items:center;
-  margin-bottom:18px;
-}
-.brand{
-  display:flex;
-  gap:12px;
-  align-items:center;
-}
-.logo{
-  width:48px;height:48px;border-radius:10px;
-  background:linear-gradient(135deg,var(--accent),var(--accent-2));
-  display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:20px;
-}
-h1{margin:0;font-size:18px;}
-p.lead{margin:0;color:var(--muted);font-size:13px}
-
-.top-row{
-  display:flex;gap:12px;align-items:flex-start;margin-top:14px;
-}
-.upload-area{
-  flex:1;
-  border:2px dashed rgba(15,118,110,0.12);
-  padding:14px;border-radius:10px;
-  min-height:88px;display:flex;flex-direction:column;gap:8px;align-items:flex-start;
-  background: linear-gradient(180deg, rgba(15,118,110,0.02), rgba(6,95,70,0.01));
-  cursor:pointer;
-}
-.upload-area.dragover{border-color:var(--accent);background:linear-gradient(180deg, rgba(15,118,110,0.04), rgba(6,95,70,0.01));}
-
-.controls{
-  display:flex;gap:8px;align-items:center;
-}
-.btn{
-  border:0;padding:8px 12px;border-radius:8px;font-weight:600;cursor:pointer;
-  background:var(--accent);color:white;
-  box-shadow: 0 6px 14px rgba(6,95,70,0.12);
-}
-.btn.secondary{background:transparent;color:var(--accent);border:1px solid rgba(15,118,110,0.12);box-shadow:none;font-weight:600;}
+body{margin:0;font-family:"Inter",sans-serif;background:#f7f8fa;color:#0f172a;padding:28px;display:flex;justify-content:center;min-height:100vh}
+.container{width:100%;max-width:980px;background:white;border-radius:14px;box-shadow:0 10px 30px rgba(12,18,30,0.08);padding:22px;overflow:hidden}
+header{display:flex;gap:16px;align-items:center;margin-bottom:18px}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,#0f766e,#065f46);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:20px}
+h1{margin:0;font-size:18px}
+p.lead{margin:0;color:#6b7280;font-size:13px}
+.top-row{display:flex;gap:12px;align-items:flex-start;margin-top:14px;flex-wrap:wrap}
+.upload-area{flex:1;border:2px dashed rgba(15,118,110,0.12);padding:14px;border-radius:10px;min-height:88px;display:flex;flex-direction:column;gap:8px;align-items:flex-start;background: linear-gradient(180deg, rgba(15,118,110,0.02), rgba(6,95,70,0.01));cursor:pointer}
+.upload-area.dragover{border-color:#0f766e;background:linear-gradient(180deg, rgba(15,118,110,0.04), rgba(6,95,70,0.01))}
+.controls{display:flex;gap:8px;align-items:center;margin-top:8px}
+.btn{border:0;padding:8px 12px;border-radius:8px;font-weight:600;cursor:pointer;background:#0f766e;color:white;box-shadow:0 6px 14px rgba(6,95,70,0.12)}
+.btn.secondary{background:transparent;color:#0f766e;border:1px solid rgba(15,118,110,0.12);box-shadow:none}
 input[type=file]{display:none}
-
-.grid{
-  display:grid;
-  grid-template-columns: repeat(auto-fill,minmax(150px,1fr));
-  gap:12px;
-}
-.thumb{
-  background: linear-gradient(180deg,#fff,#fbfbfd);
-  border-radius:10px;padding:6px;box-shadow: 0 6px 18px rgba(12,18,30,0.04);
-  display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;
-  aspect-ratio: 4/3;
-}
-.thumb img{max-width:100%;max-height:100%;object-fit:cover;border-radius:6px;display:block;}
-.thumb .meta{position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,0.45);color:white;padding:4px 6px;border-radius:6px;font-size:12px;}
-.link-like{background:transparent;border:0;color:var(--accent);cursor:pointer;font-weight:600;margin-left:6px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:18px}
+.thumb{background: linear-gradient(180deg,#fff,#fbfbfd);border-radius:10px;padding:6px;box-shadow:0 6px 18px rgba(12,18,30,0.04);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;aspect-ratio:4/3}
+.thumb img{max-width:100%;max-height:100%;object-fit:cover;border-radius:6px;display:block}
+.thumb .meta{position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,0.45);color:white;padding:4px 6px;border-radius:6px;font-size:12px}
+.link-like{background:transparent;border:0;color:#0f766e;cursor:pointer;font-weight:600;margin-left:6px}
 </style>
 </head>
 <body>
@@ -106,18 +41,17 @@ input[type=file]{display:none}
 
   <div class="top-row">
     <div class="upload-area" id="dropZone">
-      <div>
-        <strong>Fotos hochladen</strong>
-        <div class="muted">Ziehe Bilder hier hinein oder klicke zum Hochladen.</div>
-      </div>
+      <strong>Fotos hochladen</strong>
+      <div class="muted">Ziehe Bilder hier hinein oder klicke auf „Dateien wählen“.</div>
       <div class="controls">
-        <input type="file" id="fileInput" multiple>
-        <button class="btn secondary" id="clearAllBtn">Alle löschen</button>
+        <label class="btn secondary" for="fileInput">Dateien wählen</label>
+        <input type="file" id="fileInput" multiple />
+        <button class="btn" id="clearAllBtn">Alle löschen</button>
       </div>
     </div>
 
     <div style="width:240px;display:flex;flex-direction:column;gap:10px">
-      <div style="padding:10px;border-radius:10px;background:var(--card);box-shadow: 0 6px 18px rgba(12,18,30,0.03)">
+      <div style="padding:10px;border-radius:10px;background:white;box-shadow:0 6px 18px rgba(12,18,30,0.03)">
         <div style="font-weight:700;margin-bottom:6px">Downloads schützen</div>
         <div class="muted" style="margin-bottom:8px">Gib das Passwort ein, um Download-Buttons freizuschalten.</div>
         <div class="pw-wrap">
