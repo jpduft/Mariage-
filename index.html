@@ -60,6 +60,7 @@ const gallery = document.getElementById("gallery");
 const clearAllBtn = document.getElementById("clearAllBtn");
 const PASSWORD = "Stuchlik26";
 
+// Dateien hochladen
 dropZone.addEventListener("click", ()=>fileInput.click());
 dropZone.addEventListener("dragover", e=>{ e.preventDefault(); dropZone.classList.add("dragover"); });
 dropZone.addEventListener("dragleave", e=>{ dropZone.classList.remove("dragover"); });
@@ -75,18 +76,26 @@ async function handleFiles(files){
   loadGallery();
 }
 
+// Galerie laden
 async function loadGallery(){
-  const res = await fetch('/images');
-  const images = await res.json();
-  gallery.innerHTML = "";
-  images.forEach(img=>{
-    const card = document.createElement('div');
-    card.className = "thumb";
-    card.innerHTML = `<img src="${img.url}" alt="${img.name}"><div class="meta">${img.name}<button class="link-like" onclick="downloadImage('${img.name}')">Download</button></div>`;
-    gallery.appendChild(card);
-  });
+  try {
+    const res = await fetch('/images');
+    const images = await res.json();
+    gallery.innerHTML = "";
+    images.forEach(img=>{
+      const card = document.createElement('div');
+      card.className = "thumb";
+      card.innerHTML = `<img src="${img.url}" alt="${img.name}">
+        <div class="meta">${img.name}
+        <button class="link-like" onclick="downloadImage('${img.name}')">Download</button></div>`;
+      gallery.appendChild(card);
+    });
+  } catch(err) {
+    console.error("Fehler beim Laden der Galerie:", err);
+  }
 }
 
+// Download
 function downloadImage(name){
   const pw = prompt("Passwort eingeben:");
   if(pw !== PASSWORD){ alert("Falsches Passwort"); return; }
@@ -95,15 +104,15 @@ function downloadImage(name){
   link.click();
 }
 
+// Alle löschen
 clearAllBtn.addEventListener("click", async ()=>{
   if(!confirm("Alle Bilder löschen?")) return;
   await fetch('/clear', { method:'POST' });
   loadGallery();
 });
 
-// initial Galerie laden
-loadGallery();
+// Galerie direkt beim Laden anzeigen
+window.addEventListener("DOMContentLoaded", loadGallery);
 </script>
 </body>
 </html>
-
