@@ -1,11 +1,16 @@
+// server.js
 const express = require("express");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
+const cors = require("cors"); // Damit auch von anderen Geräten Zugriff möglich ist
 
 const app = express();
 const PORT = 3000;
 const PASSWORD = "Stuchlik26";
+
+// CORS aktivieren (optional, wenn du Zugriff von anderen Geräten willst)
+app.use(cors());
 
 // Ordner für Uploads sicherstellen
 const UPLOAD_DIR = path.join(__dirname, "uploads");
@@ -20,6 +25,7 @@ const upload = multer({ storage });
 
 // Statische Dateien (HTML, CSS, JS)
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/uploads", express.static(UPLOAD_DIR));
 
 // Upload Endpoint
 app.post("/upload", upload.single("file"), (req, res) => {
@@ -34,9 +40,6 @@ app.get("/images", (req, res) => {
   }));
   res.json(files);
 });
-
-// Statische Bereitstellung der Uploads
-app.use("/uploads", express.static(UPLOAD_DIR));
 
 // Download mit Passwort
 app.get("/download/:name", (req, res) => {
