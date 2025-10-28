@@ -77,11 +77,6 @@ p.lead{margin:0;color:var(--muted);font-size:13px}
 .btn.secondary{background:transparent;color:var(--accent);border:1px solid rgba(15,118,110,0.12);box-shadow:none;font-weight:600;}
 input[type=file]{display:none}
 
-.qr-box{
-  width:140px;padding:10px;border-radius:10px;background:var(--glass);display:flex;flex-direction:column;align-items:center;justify-content:center;
-}
-.muted{color:var(--muted);font-size:13px}
-
 .gallery-wrap{margin-top:18px;}
 .grid{
   display:grid;
@@ -116,7 +111,6 @@ input[type=file]{display:none}
 footer{margin-top:14px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;align-items:center}
 @media (max-width:640px){
   .top-row{flex-direction:column}
-  .qr-box{width:100%}
 }
 </style>
 </head>
@@ -126,7 +120,7 @@ footer{margin-top:14px;color:var(--muted);font-size:13px;display:flex;justify-co
     <div class="brand">
       <div class="logo">S</div>
       <div>
-        <h1>Stuchlik Galerie</h1>
+        <h1>Laura´s und Patrick´s Galerie</h1>
         <p class="lead">Fotos hochladen, anschauen und herunterladen (mit Passwort).</p>
       </div>
     </div>
@@ -142,14 +136,6 @@ footer{margin-top:14px;color:var(--muted);font-size:13px;display:flex;justify-co
         <div class="controls">
           <label class="btn secondary" for="fileInput">Dateien wählen</label>
           <input id="fileInput" type="file" accept="image/*" multiple />
-          <button class="btn" id="clearAllBtn" title="Alle entfernen">Alle löschen</button>
-        </div>
-      </div>
-      <div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <div class="muted">QR-Code für diese Seite:</div>
-        <div class="qr-box" id="qrContainer" title="QR-Code der aktuellen Seite">
-          <div id="qrcode"></div>
-          <div style="font-size:12px;margin-top:8px" class="muted">Scanne, um zur Seite zu gelangen</div>
         </div>
       </div>
     </div>
@@ -174,20 +160,9 @@ footer{margin-top:14px;color:var(--muted);font-size:13px;display:flex;justify-co
 
     <div class="grid" id="gallery"></div>
 
-    <div class="actions" style="margin-top:12px">
-      <button class="btn secondary" id="exportBtn">Export (Backup)</button>
-      <button class="btn" id="importBtn">Import (Backup laden)</button>
-      <input type="file" id="importFile" accept=".json" style="display:none"/>
-    </div>
-  </div>
-
-  <footer>
-    <div>Design: freundlich & elegant • Demo</div>
-    <div class="muted">Achtung: Passwort im Browser-Code verborgen.</div>
-  </footer>
+    
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
 const PASSWORD = "Stuchlik26";
 const STORAGE_KEY = "stuchlik_gallery_images_v1";
@@ -203,27 +178,13 @@ const exportBtn = document.getElementById("exportBtn");
 const importBtn = document.getElementById("importBtn");
 const importFile = document.getElementById("importFile");
 
-// QR Code erzeugen
-new QRCode(document.getElementById("qrcode"), {
-  text: location.href,
-  width: 110,
-  height: 110,
-  colorDark : "#0f766e",
-  colorLight : "#ffffff",
-  correctLevel : QRCode.CorrectLevel.H
-});
-
 let unlocked = false;
 
 function loadImages(){
-  try{
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");
-  }catch(e){return [];}
+  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]"); }
+  catch(e){return [];}
 }
-
-function saveImages(images){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(images));
-}
+function saveImages(images){ localStorage.setItem(STORAGE_KEY, JSON.stringify(images)); }
 
 function renderGallery(){
   const images = loadImages();
@@ -283,7 +244,6 @@ function requirePasswordThen(cb){
   if(attempt===PASSWORD){unlocked=true; cb();} else {alert("Falsches Passwort.");}
 }
 
-// Lightbox
 let currentLightboxIndex=null;
 function openLightbox(idx){
   const images = loadImages();
@@ -306,7 +266,6 @@ function openLightbox(idx){
   modal.querySelector("#modalDownloadBtn").onclick=()=>requirePasswordThen(()=>triggerDownload(images[idx]));
 }
 
-// Events
 fileInput.addEventListener("change",e=>{if(e.target.files) addFiles(e.target.files); fileInput.value="";});
 clearAllBtn.addEventListener("click",()=>{if(confirm("Alle Bilder löschen?")){localStorage.removeItem(STORAGE_KEY);renderGallery();}});
 dropZone.addEventListener("dragover",e=>{e.preventDefault(); dropZone.classList.add("dragover");});
@@ -341,7 +300,6 @@ importFile.addEventListener("change",e=>{
   importFile.value="";
 });
 
-// init
 renderGallery();
 </script>
 </body>
