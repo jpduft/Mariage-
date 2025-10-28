@@ -1,4 +1,3 @@
-// server.js
 const express = require("express");
 const multer = require("multer");
 const fs = require("fs");
@@ -9,25 +8,24 @@ const app = express();
 const PORT = 3000;
 const PASSWORD = "Stuchlik26";
 
-// CORS aktivieren, falls Zugriff von anderen Geräten
 app.use(cors());
 
-// Ordner für Uploads sicherstellen
+// Uploads-Ordner erstellen, falls nicht vorhanden
 const UPLOAD_DIR = path.join(__dirname, "uploads");
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR);
 
-// Multer Setup für Datei-Uploads
+// Multer Setup
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, UPLOAD_DIR),
   filename: (req, file, cb) => cb(null, file.originalname)
 });
 const upload = multer({ storage });
 
-// Statische Dateien (HTML/CSS/JS) aus public/
+// Statische Dateien aus public/
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(UPLOAD_DIR));
 
-// Upload Endpoint
+// Upload-Endpoint
 app.post("/upload", upload.single("file"), (req, res) => {
   res.json({ success: true });
 });
@@ -61,7 +59,4 @@ app.post("/clear", (req, res) => {
 });
 
 // Server starten
-app.listen(PORT, () => {
-  console.log(`Server läuft auf http://localhost:${PORT}`);
-});
-
+app.listen(PORT, () => console.log(`Server läuft auf http://localhost:${PORT}`));
