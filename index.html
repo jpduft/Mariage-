@@ -4,7 +4,6 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Stuchlik Galerie</title>
-
 <style>
 body{margin:0;font-family:"Inter",sans-serif;background:#f7f8fa;color:#0f172a;padding:28px;display:flex;justify-content:center;min-height:100vh}
 .container{width:100%;max-width:980px;background:white;border-radius:14px;box-shadow:0 10px 30px rgba(12,18,30,0.08);padding:22px;overflow:hidden}
@@ -49,10 +48,6 @@ input[type=file]{display:none}
         <button class="btn" id="clearAllBtn">Alle löschen</button>
       </div>
     </div>
-
-  
-      </div>
-    </div>
   </div>
 
   <div class="grid" id="gallery"></div>
@@ -62,12 +57,9 @@ input[type=file]{display:none}
 const dropZone = document.getElementById("dropZone");
 const fileInput = document.getElementById("fileInput");
 const gallery = document.getElementById("gallery");
-const pwInput = document.getElementById("pwInput");
-const pwBtn = document.getElementById("pwBtn");
 const clearAllBtn = document.getElementById("clearAllBtn");
 
 const PASSWORD = "Stuchlik26";
-let unlocked = false;
 
 // Upload-Funktion
 dropZone.addEventListener("click", ()=>fileInput.click());
@@ -80,7 +72,13 @@ async function handleFiles(files){
   for(const file of files){
     const form = new FormData();
     form.append('file', file);
-    await fetch('/upload', { method:'POST', body: form });
+    try {
+      const res = await fetch('/upload', { method:'POST', body: form });
+      const data = await res.json();
+      if(!data.success) alert(`Upload von ${file.name} fehlgeschlagen`);
+    } catch(err){
+      alert(`Upload-Fehler: ${err}`);
+    }
   }
   loadGallery();
 }
@@ -98,7 +96,7 @@ async function loadGallery(){
   });
 }
 
-// Download
+// Download mit Passwort
 function downloadImage(name){
   const pw = prompt("Passwort eingeben:");
   if(pw !== PASSWORD){ alert("Falsches Passwort"); return; }
@@ -114,13 +112,7 @@ clearAllBtn.addEventListener("click", async ()=>{
   loadGallery();
 });
 
-// Passwort prüfen
-pwBtn.addEventListener("click", ()=>{
-  if(pwInput.value === PASSWORD){ unlocked = true; alert("Passwort korrekt — Downloads freigeschaltet."); }
-  else { unlocked=false; alert("Falsches Passwort."); }
-});
-
-// initial Galerie laden
+// Initial Galerie laden
 loadGallery();
 </script>
 </body>
